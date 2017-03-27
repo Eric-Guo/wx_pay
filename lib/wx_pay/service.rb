@@ -1,4 +1,4 @@
-require 'rest_client'
+require 'http'
 require 'json'
 require 'cgi'
 require 'securerandom'
@@ -17,12 +17,18 @@ module WxPay
       options = WxPay.extra_http_options.merge(options)
       url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=#{WxPay.appid}&secret=#{WxPay.appsecret}&code=#{authorization_code}&grant_type=authorization_code"
 
-      ::JSON.parse(RestClient::Request.execute(
-        {
-          method: :get,
-          url: url
-        }.merge(options)
-      ), quirks_mode: true)
+      write_timeout = options.delete(:write_timeout) || 0.5
+      connect_timeout = options.delete(:connect_timeout) || 0.5
+      read_timeout = options.delete(:read_timeout) || 0.5
+      headers = options.delete(:headers) || {}
+      headers['Accept'] ||= 'application/json'
+      params = options.delete(:params)
+      verify_ssl = options.delete(:verify_ssl) || OpenSSL::SSL::VERIFY_PEER
+      ssl_context = OpenSSL::SSL::SSLContext.new
+      ssl_context.ssl_version = :TLSv1_client
+      ssl_context.verify_mode = verify_ssl
+      ::JSON.parse(HTTP.timeout(:per_operation, write: write_timeout, connect: connect_timeout, read: read_timeout)
+                       .headers(headers).get(url, params: params, ssl_context: ssl_context).to_s, quirks_mode: true)
     end
 
     INVOKE_UNIFIEDORDER_REQUIRED_FIELDS = [:body, :out_trade_no, :total_fee, :spbill_create_ip, :notify_url, :trade_type]
