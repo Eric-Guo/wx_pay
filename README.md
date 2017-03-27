@@ -45,8 +45,8 @@ WxPay.set_apiclient_by_pkcs12(File.read(pkcs12_filepath), pass)
 # if you want to use `generate_authorize_req` and `authenticate`
 WxPay.appsecret = 'YOUR_SECRET' 
 
-# optional - configurations for RestClient timeout, etc.
-WxPay.extra_rest_client_options = {timeout: 2, open_timeout: 3}
+# optional - configurations for http timeout, etc.
+WxPay.extra_http_options = {timeout: 2, open_timeout: 3}
 ```
 
 Note: You should create your APIKEY (Link to [微信商户平台](https://pay.weixin.qq.com/index.php/home/login)) first if you haven't, and pay attention that **the length of the APIKEY should be 32**.

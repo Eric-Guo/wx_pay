@@ -14,7 +14,7 @@ module WxPay
     end
 
     def self.authenticate(authorization_code, options = {})
-      options = WxPay.extra_rest_client_options.merge(options)
+      options = WxPay.extra_http_options.merge(options)
       url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=#{WxPay.appid}&secret=#{WxPay.appsecret}&code=#{authorization_code}&grant_type=authorization_code"
 
       ::JSON.parse(RestClient::Request.execute(
@@ -326,7 +326,7 @@ module WxPay
       end
 
       def invoke_remote(url, payload, options = {})
-        options = WxPay.extra_rest_client_options.merge(options)
+        options = WxPay.extra_http_options.merge(options)
 
         RestClient::Request.execute(
           {
